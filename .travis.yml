@@ -1,0 +1,41 @@
+# 指定语言环境
+language: node_js
+
+# 指定需要sudo权限
+sudo: required
+
+# 指定node_js版本，目前指定和自己本机的版本号一致
+node_js: 
+  - 10.12.0
+
+# This caches $HOME/.npm or node_modules, depending on the repository’s structure.
+cache: npm
+
+before_install:
+  - npm install
+  - npm install -g hexo
+
+# 确保安装所有 Hexo 所需要的功能插件
+install:
+  - npm install hexo-generator-index --save
+  - npm install hexo-generator-archive --save
+  - npm install hexo-generator-category --save
+  - npm install hexo-generator-tag --save
+  - npm install hexo-server --save
+  - npm install hexo-deployer-git --save
+
+# 执行清缓存，生成网页操作
+script:
+  - hexo clean
+  - hexo generate
+
+# 设置git提交名，邮箱；替换真实token到_config.yml文件，最后depoy部署
+after_script:
+  - git config user.name "fei"
+  - git config user.email "wangfei.dream@gmail.com"
+  # 替换同目录下的_config.yml文件中gh_token字符串为travis后台刚才配置的变量，注意此处sed命令用了双引号。单引号无效！
+  - sed -i "s/gh_token/${GH_TOKEN}/g" ./_config.yml
+  - hexo deploy
+  
+notifications:
+  # slack: chensworkspace:0iUM9QJqC1dzq27bJ9Fw87pn
